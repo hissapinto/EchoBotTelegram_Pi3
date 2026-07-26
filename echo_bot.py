@@ -2,8 +2,12 @@
 
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
+from dotenv import load_dotenv
 import logging
 import os
+
+# Fetch Token via env
+load_dotenv()
 
 # Enable logging
 logging.basicConfig(
@@ -19,7 +23,7 @@ async def start(update: Update, context):
 	"""Sends a welcomer message when the command /start is issued."""
 	user = update.effective_user
 	await update.message.reply_html(
-		f"Saudações {user.mention_html()}! Este que vos fala se entitula como um androide de interlocução pleonástica! Conte-me algo....",
+		f"Saudações {user.mention_html()}! Este que vos fala se entitula como um androide de interlocução pleonástica! Conte-me algo ou digite /help para ajuda...",
 		# reply_markup=ForceReply(selective=True),
 		# # Optional: force reply to this message
 	)
@@ -46,8 +50,8 @@ def main() -> None:
 	app = Application.builder().token(TOKEN).build()
 
 	# Register handlers
-	app.add_handler(CommandHandler("inicio", start))
-	app.add_handler(CommandHandler("ajuda", help))
+	app.add_handler(CommandHandler("start", start))
+	app.add_handler(CommandHandler("help", help))
 	app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
 	# Run the bot until user presses Ctrl-C
