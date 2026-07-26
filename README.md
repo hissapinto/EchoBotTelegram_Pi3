@@ -1,4 +1,5 @@
 # EchoBot Telegram — Raspberry Pi
+**[@hissapinto_pi3_bot](https://t.me/hissapinto_pi3_bot)**
 
 Bot de Telegram em Python, rodando 24/7 como serviço em um Raspberry Pi 3 Model B.
 
