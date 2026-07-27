@@ -1,5 +1,3 @@
-# Tutorial Echo Bot: https://teleclaw.bot/blog/telegram-bot-python-tutorial
-
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 from dotenv import load_dotenv
