@@ -4,7 +4,10 @@ from dotenv import load_dotenv
 import logging
 import os
 import requests
-
+import sys
+import time
+import random
+import datetime
 
 # Fetch Token via env
 load_dotenv()
@@ -33,11 +36,20 @@ async def echo(update: Update, context):
 	"""Echoes the user message."""
 	await update.message.reply_text(update.message.text)
 
+# roll
+async def roll(update: Update, context):
+	"""Send a number between 1 - 6"""
+	await update.message.reply_text(f"O número sorteado foi: {random.randint(1,6)}")
+
+# time
+async def get_time(update: Update, context):
+	"""Tells the time"""
+	await update.message.reply_text(f"São {datetime.datetime.now().strftime('%H:%M')}")
 
 # help
 async def help(update: Update, context):
 	"""Send a help message."""
-	await update.message.reply_text("Diga-me quaisquer pensamento, seja este frívolo ou pujante, e eu ecoá-lo-ei! Se não souber o que espressar, me peça /facts e aprenda algo novo em inglês.")
+	await update.message.reply_text("Diga-me quaisquer pensamento, seja este frívolo ou pujante, e eu ecoá-lo-ei! Se não souber o que espressar, me peça /facts e aprenda algo novo em inglês, /dice para sortear um número de 1 a 6 ou /time para saber as horas.")
 # facts
 async def get_fact(update: Update, context):
 	"""Fetch a random fact from an external API."""
@@ -66,6 +78,8 @@ def main() -> None:
 	app.add_handler(CommandHandler("start", start))
 	app.add_handler(CommandHandler("help", help))
 	app.add_handler(CommandHandler("facts", get_fact))
+	app.add_handler(CommandHandler("dice", roll))
+	app.add_handler(CommandHandler("time", get_time))
 	app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
 	# Run the bot until user presses Ctrl-C
