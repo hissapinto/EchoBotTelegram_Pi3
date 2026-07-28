@@ -27,9 +27,7 @@ async def start(update: Update, context):
 	"""Sends a welcomer message when the command /start is issued."""
 	user = update.effective_user
 	await update.message.reply_html(
-		f"Saudações, {user.mention_html()}! Este que vos fala se entitula como um andróide de interlocução pleonástica! Conte-me algo ou digite /help para ajuda...",
-		# reply_markup=ForceReply(selective=True),
-		# # Optional: force reply to this message
+		f"Olá, {user.mention_html()}! Eu sou um bot de eco, mas também posso lhe ajudar com algumas outras coisas. Digite /help para saber mais."
 	)
 
 # echo
@@ -51,17 +49,18 @@ async def get_time(update: Update, context):
 async def alarm(update: Update, context):
 	"""Sets an alarm for a specified number of seconds."""
 	try:
-		seconds = int(context.args[0])
-		await update.message.reply_text(f"Alarme definido para {seconds} segundos.")
-		await asyncio.sleep(seconds)
-		await update.message.reply_text(f"Alarme de {seconds} segundos! O tempo acabou!")
+		minutes = int(context.args[0] * 60)
+		label = " ".join(context.args[1:]) if len(context.args) > 1 else "Alarme"
+		await update.message.reply_text(f"Lembrete - {label} - definido para {minutes} minutos.")
+		await asyncio.sleep(minutes) 
+		await update.message.reply_text(f"Passaram-se {minutes} minutos! {label}")
 	except (IndexError, ValueError):
-		await update.message.reply_text("Uso: /alarm <segundos>")
+		await update.message.reply_text("Uso: /alarm <minutos> <o que você quer lembrar> (ex: /alarm 10 ligar mãe)")
 
 # help
 async def help(update: Update, context):
 	"""Send a help message."""
-	await update.message.reply_text("Diga-me quaisquer pensamento, seja este frívolo ou pujante, e eu ecoá-lo-ei! Se não souber o que espressar, me peça /facts e aprenda algo novo em inglês, /dice para sortear um número de 1 a 6 ou /time para saber as horas.")
+	await update.message.reply_text("Me mande uma mensagem e eu lhe retorno a mesma mensagem. Você também pode usar os seguintes comandos:\n/start - Iniciar o bot\n/help - Exibir esta mensagem de ajuda\n/facts - Obter um fato interessante em inglês\n/dice - Sortear um número entre 1 e 6\n/time - Ver a hora atual\n/alarm - Definir um lembrete que dispara em minutos (ex: /alarm 10 ligar mãe)")
 # facts
 async def get_fact(update: Update, context):
 	"""Fetch a random fact from an external API."""
