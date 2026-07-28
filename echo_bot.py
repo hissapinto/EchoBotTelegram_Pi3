@@ -46,6 +46,17 @@ async def get_time(update: Update, context):
 	"""Tells the time"""
 	await update.message.reply_text(f"São {datetime.datetime.now().strftime('%H:%M')}")
 
+# alarm
+async def alarm(update: Update, context):
+	"""Sets an alarm for a specified number of seconds."""
+	try:
+		seconds = int(context.args[0])
+		await update.message.reply_text(f"Alarme definido para {seconds} segundos.")
+		time.sleep(seconds)
+		await update.message.reply_text(f"Alarme de {seconds} segundos! O tempo acabou!")
+	except (IndexError, ValueError):
+		await update.message.reply_text("Uso: /alarm <segundos>")
+
 # help
 async def help(update: Update, context):
 	"""Send a help message."""
