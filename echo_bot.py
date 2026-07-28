@@ -8,6 +8,7 @@ import sys
 import time
 import random
 import datetime
+import asyncio
 
 # Fetch Token via env
 load_dotenv()
@@ -52,7 +53,7 @@ async def alarm(update: Update, context):
 	try:
 		seconds = int(context.args[0])
 		await update.message.reply_text(f"Alarme definido para {seconds} segundos.")
-		time.sleep(seconds)
+		await asyncio.sleep(seconds)
 		await update.message.reply_text(f"Alarme de {seconds} segundos! O tempo acabou!")
 	except (IndexError, ValueError):
 		await update.message.reply_text("Uso: /alarm <segundos>")
