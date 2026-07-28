@@ -60,7 +60,7 @@ async def alarm(update: Update, context):
 # help
 async def help(update: Update, context):
 	"""Send a help message."""
-	await update.message.reply_text("Me mande uma mensagem e eu lhe retorno a mesma mensagem. Você também pode usar os seguintes comandos:\n/start - Iniciar o bot\n/help - Exibir esta mensagem de ajuda\n/facts - Obter um fato interessante em inglês\n/dice - Sortear um número entre 1 e 6\n/time - Ver a hora atual\n/alarm - Definir um lembrete que dispara em minutos (ex: /alarm 10 ligar mãe)")
+	await update.message.reply_text("Me mande uma mensagem e eu lhe retorno a mesma mensagem.\nVocê também pode usar os seguintes comandos:\n/start - Iniciar o bot\n/help - Exibir esta mensagem de ajuda\n/facts - Obter um fato interessante em inglês\n/dice - Sortear um número entre 1 e 6\n/time - Ver a hora atual\n/alarm - Definir um lembrete que dispara em minutos (ex: /alarm 10 ligar mãe)")
 # facts
 async def get_fact(update: Update, context):
 	"""Fetch a random fact from an external API."""
