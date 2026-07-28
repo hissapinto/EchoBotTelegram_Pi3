@@ -71,7 +71,7 @@ async def alarm_days(update: Update, context):
 		await asyncio.sleep(total_seconds)
 		await update.message.reply_text(f"Lembre-se!\n{label}!")
 	except (IndexError, ValueError):
-		await update.message.reply_text("Uso: /alarm <dias> <horário em 24h> <o que você quer lembrar>\(ex: /alarm 2 11:30 Volte para a academia)\n Agendará um lembrete para daqui a 2 dias às 11:30.")
+		await update.message.reply_text("Uso: /alarm <dias> <horário em 24h> <o que você quer lembrar>\(ex: /alarm_days 2 11:30 Volte para a academia)\n Agendará um lembrete para daqui a 2 dias às 11:30.")
 
 # help
 async def help(update: Update, context):
@@ -80,7 +80,7 @@ async def help(update: Update, context):
 	"Você também pode usar os seguintes comandos:\n/start - Iniciar o bot\n/help - Exibir esta mensagem de ajuda\n"
 	"/facts - Obter um fato interessante em inglês\n/dice - Sortear um número entre 1 e 6\n/time - Ver a hora atual\n"
 	"/alarm_min - Definir um lembrete que dispara em minutos (ex: /alarm_min 10 Ligue para sua mãe)\n"
-	"/alarm_days - Definir um lembrete que dispara em dias (ex: /alarm_days 2 Compre leite)")
+	"/alarm_days - Definir um lembrete que dispara em dias (ex: /alarm_days 2 12:00 Compre leite)")
 
 # facts
 async def get_fact(update: Update, context):
