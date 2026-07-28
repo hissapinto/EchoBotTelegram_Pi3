@@ -4,8 +4,6 @@ from dotenv import load_dotenv
 import logging
 import os
 import requests
-import sys
-import time
 import random
 import datetime
 import asyncio
@@ -45,8 +43,8 @@ async def get_time(update: Update, context):
 	"""Tells the time"""
 	await update.message.reply_text(f"São {datetime.datetime.now().strftime('%H:%M')}")
 
-# alarm
-async def alarm(update: Update, context):
+# alarm minutes
+async def alarm_min(update: Update, context):
 	"""Sets an alarm for a specified number of minutes."""
 	try:
 		minutes = int(context.args[0]) * 60
@@ -57,10 +55,33 @@ async def alarm(update: Update, context):
 	except (IndexError, ValueError):
 		await update.message.reply_text("Uso: /alarm <minutos> <o que você quer lembrar> (ex: /alarm 10 Saia de casa)")
 
+# alarm days
+async def alarm_days(update: Update, context):
+	"""Sets an alarm for a specified number of days."""
+	try:
+		now = datetime.datetime.now()
+		days = int(context.args[0])
+		hour, minute = map(int, context.args[1].split(':'))
+		future_day = now + datetime.timedelta(days=days) # Calculate the future date
+		alarm_time = future_day.replace(hour=hour, minute=minute, second=0, microsecond=0) # Calculate the exact alarm time
+		total_seconds = int((alarm_time - now).total_seconds()) # Calculate the total seconds until the alarm
+
+		label = " ".join(context.args[2:]) if len(context.args) > 2 else "Alarme"
+		await update.message.reply_text(f"Lembrete: {label}.\nDefinido para daqui {days} dias às {hour:02d}:{minute:02d}.")
+		await asyncio.sleep(total_seconds)
+		await update.message.reply_text(f"Lembre-se!\n{label}!")
+	except (IndexError, ValueError):
+		await update.message.reply_text("Uso: /alarm <dias> <horário em 24h> <o que você quer lembrar>\(ex: /alarm 2 11:30 Volte para a academia)\n Agendará um lembrete para daqui a 2 dias às 11:30.")
+
 # help
 async def help(update: Update, context):
 	"""Send a help message."""
-	await update.message.reply_text("Me mande uma mensagem e eu lhe retorno a mesma mensagem.\n\nVocê também pode usar os seguintes comandos:\n/start - Iniciar o bot\n/help - Exibir esta mensagem de ajuda\n/facts - Obter um fato interessante em inglês\n/dice - Sortear um número entre 1 e 6\n/time - Ver a hora atual\n/alarm - Definir um lembrete que dispara em minutos (ex: /alarm 10 Ligue para sua mãe)")
+	await update.message.reply_text("Me mande uma mensagem e eu lhe retorno a mesma mensagem.\n\n" \
+	"Você também pode usar os seguintes comandos:\n/start - Iniciar o bot\n/help - Exibir esta mensagem de ajuda\n"
+	"/facts - Obter um fato interessante em inglês\n/dice - Sortear um número entre 1 e 6\n/time - Ver a hora atual\n"
+	"/alarm_min - Definir um lembrete que dispara em minutos (ex: /alarm_min 10 Ligue para sua mãe)\n"
+	"/alarm_days - Definir um lembrete que dispara em dias (ex: /alarm_days 2 Compre leite)")
+
 # facts
 async def get_fact(update: Update, context):
 	"""Fetch a random fact from an external API."""
@@ -81,7 +102,8 @@ def add_handlers(app):
 	app.add_handler(CommandHandler("facts", get_fact))
 	app.add_handler(CommandHandler("dice", roll))
 	app.add_handler(CommandHandler("time", get_time))
-	app.add_handler(CommandHandler("alarm", alarm))
+	app.add_handler(CommandHandler("alarm", alarm_min))
+	app.add_handler(CommandHandler("alarm_days", alarm_days))
 	app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
 # main
