@@ -53,7 +53,7 @@ async def alarm_min(update: Update, context):
 		await asyncio.sleep(minutes) 
 		await update.message.reply_text(f"Passaram-se {int(minutes/60)} minutos!\n{label}!")
 	except (IndexError, ValueError):
-		await update.message.reply_text("Uso: /alarm <minutos> <o que você quer lembrar> (ex: /alarm 10 Saia de casa)")
+		await update.message.reply_text("Uso: /alarm_min <minutos> <o que você quer lembrar> (ex: /alarm 10 Saia de casa)")
 
 # alarm days
 async def alarm_days(update: Update, context):
@@ -102,7 +102,7 @@ def add_handlers(app):
 	app.add_handler(CommandHandler("facts", get_fact))
 	app.add_handler(CommandHandler("dice", roll))
 	app.add_handler(CommandHandler("time", get_time))
-	app.add_handler(CommandHandler("alarm", alarm_min))
+	app.add_handler(CommandHandler("alarm_min", alarm_min))
 	app.add_handler(CommandHandler("alarm_days", alarm_days))
 	app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
