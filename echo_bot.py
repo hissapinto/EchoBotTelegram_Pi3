@@ -47,20 +47,20 @@ async def get_time(update: Update, context):
 
 # alarm
 async def alarm(update: Update, context):
-	"""Sets an alarm for a specified number of seconds."""
+	"""Sets an alarm for a specified number of minutes."""
 	try:
 		minutes = int(context.args[0]) * 60
 		label = " ".join(context.args[1:]) if len(context.args) > 1 else "Alarme"
-		await update.message.reply_text(f"Lembrete: {label}.\nDefinido para {minutes/60} minutos.")
+		await update.message.reply_text(f"Lembrete: {label}.\nDefinido para {int(minutes/60)} minutos.")
 		await asyncio.sleep(minutes) 
-		await update.message.reply_text(f"Passaram-se {minutes/60} minutos!\n{label}!!")
+		await update.message.reply_text(f"Passaram-se {int(minutes/60)} minutos!\n{label}!")
 	except (IndexError, ValueError):
-		await update.message.reply_text("Uso: /alarm <minutos> <o que você quer lembrar> (ex: /alarm 10 Sair de casa)")
+		await update.message.reply_text("Uso: /alarm <minutos> <o que você quer lembrar> (ex: /alarm 10 Saia de casa)")
 
 # help
 async def help(update: Update, context):
 	"""Send a help message."""
-	await update.message.reply_text("Me mande uma mensagem e eu lhe retorno a mesma mensagem.\n\nVocê também pode usar os seguintes comandos:\n/start - Iniciar o bot\n/help - Exibir esta mensagem de ajuda\n/facts - Obter um fato interessante em inglês\n/dice - Sortear um número entre 1 e 6\n/time - Ver a hora atual\n/alarm - Definir um lembrete que dispara em minutos (ex: /alarm 10 ligar mãe)")
+	await update.message.reply_text("Me mande uma mensagem e eu lhe retorno a mesma mensagem.\n\nVocê também pode usar os seguintes comandos:\n/start - Iniciar o bot\n/help - Exibir esta mensagem de ajuda\n/facts - Obter um fato interessante em inglês\n/dice - Sortear um número entre 1 e 6\n/time - Ver a hora atual\n/alarm - Definir um lembrete que dispara em minutos (ex: /alarm 10 Ligue para sua mãe)")
 # facts
 async def get_fact(update: Update, context):
 	"""Fetch a random fact from an external API."""
