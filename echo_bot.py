@@ -53,8 +53,7 @@ async def _alarm_callback(context):
 async def alarm_min(update: Update, context):
 	"""Sets an alarm for a specified number of minutes."""
 	try:
-		minutes = int(context.args[0]) * 60
-		total_seconds = minutes * 60
+		total_seconds = int(context.args[0]) * 60
 		label = " ".join(context.args[1:]) if len(context.args) > 1 else "Alarme"
 
 		chat_id = update.effective_chat.id # Get the user's chat ID
@@ -64,7 +63,7 @@ async def alarm_min(update: Update, context):
 			chat_id=chat_id,
 			data=label
 		)
-		await update.message.reply_text(f"Lembrete: {label}.\nDefinido para {int(minutes/60)} minutos.")
+		await update.message.reply_text(f"Lembrete: {label}.\nDefinido para {int(total_seconds/60)} minutos.")
 
 	except (IndexError, ValueError):
 		await update.message.reply_text("Uso: /alarm_min <minutos> <o que você quer lembrar> (ex: /alarm 10 Saia de casa)")
