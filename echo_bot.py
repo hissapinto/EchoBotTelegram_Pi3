@@ -74,6 +74,15 @@ async def get_fact(update: Update, context):
 		await update.message.reply_text("Deculpe, eu não consegui buscar um fato agora. Tente novamente mais tarde.")
 
 
+# add handlers
+def add_handlers(app):
+	app.add_handler(CommandHandler("start", start))
+	app.add_handler(CommandHandler("help", help))
+	app.add_handler(CommandHandler("facts", get_fact))
+	app.add_handler(CommandHandler("dice", roll))
+	app.add_handler(CommandHandler("time", get_time))
+	app.add_handler(CommandHandler("alarm", alarm))
+	app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
 # main
 def main() -> None:
@@ -86,12 +95,7 @@ def main() -> None:
 	app = Application.builder().token(TOKEN).build()
 
 	# Register handlers
-	app.add_handler(CommandHandler("start", start))
-	app.add_handler(CommandHandler("help", help))
-	app.add_handler(CommandHandler("facts", get_fact))
-	app.add_handler(CommandHandler("dice", roll))
-	app.add_handler(CommandHandler("time", get_time))
-	app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+	add_handlers(app)
 
 	# Run the bot until user presses Ctrl-C
 	app.run_polling(allowed_updates=Update.ALL_TYPES)
