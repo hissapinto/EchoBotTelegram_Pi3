@@ -6,7 +6,7 @@ import os
 import requests
 import random
 import datetime
-import asyncio
+import json
 
 # Fetch Token via env
 load_dotenv()
@@ -16,8 +16,10 @@ logging.basicConfig(
 	format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 	level=logging.INFO
 )
-logger = logging.getLogger(__name__)
 
+# set higher logging level for httpx to avoid all GET and POST requests being logged
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logger = logging.getLogger(__name__)
 
 # Handlers: functions that process incoming updates
 # start
@@ -116,7 +118,32 @@ async def get_fact(update: Update, context):
 		await update.message.reply_text(f"Did you know? {fact_data['text']}")
 	except requests.exceptions.RequestException as e:
 		logger.error(f"Erro ao buscar um fato: {e}")
-		await update.message.reply_text("Deculpe, eu não consegui buscar um fato agora. Tente novamente mais tarde.")
+		await update.message.reply_text("Desculpe, eu não consegui buscar um fato agora. Tente novamente mais tarde.")
+
+# label = " ".join(context.args[1:]) if len(context.args) > 1 else "Alarme"
+# city persistence
+async def city(update: Update, context):
+	"""Saves or print the city name"""
+	if len(context.args) < 1:
+		try: 
+			with open('user_info.json') as file: # 'with' closes the file without the need of file.close() command
+				user_info = json.load(file)
+		except FileNotFoundError:
+			user_info = {} # creates missing dic
+
+			if 'city' in user_info:
+				city = user_info['city']
+				await update.message.reply_text(f"A cidade escolhida para as notificações de tempo é {city}." \
+				"\nPara atualizar a cidade escreva /city <nome da cidade>.")
+			else:
+				await update.message.reply_text("Sem cidade determinada para as atualizações do tempo." \
+				"\nPara escolher a cidade escreva /city <nome da cidade>.")
+	else:
+		city = " ".join(context.args)
+		user_info = {'city': city}
+		with open('user_info.json', 'w') as file:
+			json.dump(user_info, file)
+		await update.message.reply_text(f"Cidade atualizada para {city}.")
 
 
 # add handlers
@@ -132,10 +159,15 @@ def add_handlers(app):
 
 # main
 def main() -> None:
+	# Token verification
 	TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
-
 	if not TOKEN:
 		raise ValueError("TELEGRAM_BOT_TOKEN environment variable not set.")
+
+	# Persistence
+	user_info = {} # dic {key, value}
+	with open("user_info.json", "w") as json_file:
+		json.dump(user_info, json_file) # dump -> writes the data into a file
 
 	# Create the application and pass it back to your bot's token.
 	app = Application.builder().token(TOKEN).build()
