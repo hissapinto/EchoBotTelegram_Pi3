@@ -7,6 +7,8 @@ import requests
 import random
 import datetime
 import json
+import asyncio
+import nominatim_api as napi
 
 # Fetch Token via env
 load_dotenv()
@@ -132,17 +134,25 @@ async def city(update: Update, context):
 
 		if 'city' in user_info:
 			city = user_info['city']
-			await update.message.reply_text(f"A cidade escolhida para as notificações de tempo é {city}." \
+			await update.message.reply_text(f"A cidade escolhida para as notificações de tempo é {city}, latitude = {lat} e longitude = {lon}." \
 			"\nPara atualizar a cidade escreva /city <nome da cidade>.")
 		else:
 			await update.message.reply_text("Sem cidade determinada para as atualizações do tempo." \
 			"\nPara escolher a cidade escreva /city <nome da cidade>.")
 	else:
 		city = " ".join(context.args)
-		user_info = {'city': city}
+		geo = asyncio.run(_geo_info(city))
+		lat = geo[0].centroid.y
+		lon = geo[0].centroid.x
+		user_info = {'city' : city, 'lat' : lat, 'lon' : lon}
+
 		with open('user_info.json', 'w') as file:
 			json.dump(user_info, file)
-		await update.message.reply_text(f"Cidade atualizada para {city}.")
+		await update.message.reply_text(f"Cidade atualizada para {city}, latitude = {lat} e longitude = {lon}.")
+
+async def _geo_info(query):
+    async with napi.NominatimAPIAsync() as api:
+        return await api.search(query)
 
 
 # add handlers
