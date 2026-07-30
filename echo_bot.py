@@ -7,8 +7,6 @@ import requests
 import random
 import datetime
 import json
-import asyncio
-import nominatim_api as napi
 
 # Fetch Token via env
 load_dotenv()
@@ -120,7 +118,7 @@ async def get_fact(update: Update, context):
 		await update.message.reply_text(f"Did you know? {fact_data['text']}")
 	except requests.exceptions.RequestException as e:
 		logger.error(f"Erro ao buscar um fato: {e}")
-		await update.message.reply_text("Desculpe, eu não consegui buscar um fato agora. Tente novamente mais tarde.")
+		await update.message.reply_text("Desculpe, não consegui buscar um fato agora. Tente novamente mais tarde.")
 
 # city persistence
 async def city(update: Update, context):
@@ -134,25 +132,29 @@ async def city(update: Update, context):
 
 		if 'city' in user_info:
 			city = user_info['city']
-			await update.message.reply_text(f"A cidade escolhida para as notificações de tempo é {city}, latitude = {lat} e longitude = {lon}." \
+			await update.message.reply_text(f"A cidade escolhida para as notificações de tempo é {city}." \
 			"\nPara atualizar a cidade escreva /city <nome da cidade>.")
 		else:
 			await update.message.reply_text("Sem cidade determinada para as atualizações do tempo." \
 			"\nPara escolher a cidade escreva /city <nome da cidade>.")
 	else:
-		city = " ".join(context.args)
-		geo = asyncio.run(_geo_info(city))
-		lat = geo[0].centroid.y
-		lon = geo[0].centroid.x
-		user_info = {'city' : city, 'lat' : lat, 'lon' : lon}
+		try:
+			city = " ".join(context.args)
+			resp = requests.get("https://geocoding-api.open-meteo.com/v1/search",
+                    params={"name": city, "count": 1, "language": "pt"})
+			resp.raise_for_status()
+			resp_data = resp.json()
 
-		with open('user_info.json', 'w') as file:
-			json.dump(user_info, file)
-		await update.message.reply_text(f"Cidade atualizada para {city}, latitude = {lat} e longitude = {lon}.")
+			lat = resp_data['results'][0]["latitude"]
+			lon = resp_data['results'][0]["longitude"]
+			user_info = {'city' : city, 'lat' : lat, 'lon' : lon}
 
-async def _geo_info(query):
-    async with napi.NominatimAPIAsync() as api:
-        return await api.search(query)
+			with open('user_info.json', 'w') as file:
+				json.dump(user_info, file)
+			await update.message.reply_text(f"Cidade atualizada para {city}. Latitude = {lat}, longitude = {lon}")
+		except requests.exceptions.RequestException as e:
+				logger.error(f"Erro ao buscar latitude e longitude: {e}")
+				await update.message.reply_text("Desculpe, não consegui atualizar sua cidade agora. Tente novamente mais tarde.")
 
 
 # add handlers
