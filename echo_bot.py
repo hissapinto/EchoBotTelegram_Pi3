@@ -161,7 +161,7 @@ async def city(update: Update, context):
 				await update.message.reply_text("Desculpe, não consegui atualizar sua cidade agora. Tente novamente mais tarde.")
 
 # city forecast
-async def forecast(update: Update):
+async def forecast(update: Update, context):
 	"""Fetch city forecast information via open meteo API"""
 	try: 
 		with open('user_info.json') as file:
