@@ -189,9 +189,9 @@ async def forecast(update: Update, context):
 		responses = openmeteo.weather_api(url, params = params)
 		resp = responses[0]
 		daily = resp.Daily()
-		temp_max = daily.Variables(0).ValuesAsNumpy()
-		temp_min = daily.Variables(1).ValuesAsNumpy()
-		precipitation_prob = daily.Variables(2).ValuesAsNumpy()
+		temp_max = daily.Variables(0)
+		temp_min = daily.Variables(1)
+		precipitation_prob = daily.Variables(2)
 
 		await update.message.reply_text(f"Hoje {city} terá a máxima de {temp_max} e a mínima de {temp_min},\ncom chance máxima de precipitação de {precipitation_prob}.")
 		
