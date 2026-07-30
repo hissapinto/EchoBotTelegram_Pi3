@@ -188,7 +188,7 @@ async def forecast(update: Update, context):
 	rain = resp["daily"]["precipitation_probability_max"][0]
 
 	await update.message.reply_text(
-        f"Hoje {city} terá máxima de {temp_max}°C e mínima de {temp_min}°C,\n"
+        f"Hoje {city} terá máxima de {temp_max}°C e mínima de {temp_min}°C,"
         f"com chance máxima de chuva de {rain}%.")
 
 # add handlers
