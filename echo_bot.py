@@ -120,7 +120,6 @@ async def get_fact(update: Update, context):
 		logger.error(f"Erro ao buscar um fato: {e}")
 		await update.message.reply_text("Desculpe, eu não consegui buscar um fato agora. Tente novamente mais tarde.")
 
-# label = " ".join(context.args[1:]) if len(context.args) > 1 else "Alarme"
 # city persistence
 async def city(update: Update, context):
 	"""Saves or print the city name"""
@@ -155,6 +154,7 @@ def add_handlers(app):
 	app.add_handler(CommandHandler("time", get_time))
 	app.add_handler(CommandHandler("alarm_min", alarm_min))
 	app.add_handler(CommandHandler("alarm_days", alarm_days))
+	app.add_handler(CommandHandler("city", city))
 	app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
 # main
@@ -163,11 +163,6 @@ def main() -> None:
 	TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 	if not TOKEN:
 		raise ValueError("TELEGRAM_BOT_TOKEN environment variable not set.")
-
-	# Persistence
-	user_info = {} # dic {key, value}
-	with open("user_info.json", "w") as json_file:
-		json.dump(user_info, json_file) # dump -> writes the data into a file
 
 	# Create the application and pass it back to your bot's token.
 	app = Application.builder().token(TOKEN).build()
