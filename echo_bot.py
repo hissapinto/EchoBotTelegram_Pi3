@@ -102,11 +102,17 @@ async def alarm_days(update: Update, context):
 # help
 async def help(update: Update, context):
 	"""Send a help message."""
-	await update.message.reply_text("Me mande uma mensagem e eu lhe retorno a mesma mensagem.\n\n" \
-	"Você também pode usar os seguintes comandos:\n/start - Iniciar o bot\n/help - Exibir esta mensagem de ajuda\n"
-	"/facts - Obter um fato interessante em inglês\n/dice - Sortear um número entre 1 e 6\n/time - Ver a hora atual\n"
+	await update.message.reply_text("Me mande uma mensagem e eu lhe retorno a mesma mensagem.\n\n"
+	"Você também pode usar os seguintes comandos:\n"
+	"/start - Iniciar o bot\n"
+	"/help - Exibir esta mensagem de ajuda\n"
 	"/alarm_min - Definir um lembrete que dispara em minutos (ex: /alarm_min 10 Ligue para sua mãe)\n"
-	"/alarm_days - Definir um lembrete que dispara em dias (ex: /alarm_days 2 12:00 Compre leite)")
+	"/alarm_days - Definir um lembrete que dispara em dias (ex: /alarm_days 2 12:00 Compre leite)\n"
+	"/city - Definir que cidade você se encontra para utilizar o comando /forecast\n"
+	"/forecast - Trás informações diárias do clima.\n"
+	"/facts - Obter um fato interessante em inglês\n"
+	"/dice - Sortear um número entre 1 e 6\n/time - Ver a hora atual\n"
+	)
 
 # facts
 async def get_fact(update: Update, context):
