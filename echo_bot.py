@@ -208,6 +208,7 @@ def add_handlers(app):
 	app.add_handler(CommandHandler("alarm_min", alarm_min))
 	app.add_handler(CommandHandler("alarm_days", alarm_days))
 	app.add_handler(CommandHandler("city", city))
+	app.add_handler(CommandHandler("forecast", forecast))
 	app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
 # main
