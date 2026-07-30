@@ -130,13 +130,13 @@ async def city(update: Update, context):
 		except FileNotFoundError:
 			user_info = {} # creates missing dic
 
-			if 'city' in user_info:
-				city = user_info['city']
-				await update.message.reply_text(f"A cidade escolhida para as notificações de tempo é {city}." \
-				"\nPara atualizar a cidade escreva /city <nome da cidade>.")
-			else:
-				await update.message.reply_text("Sem cidade determinada para as atualizações do tempo." \
-				"\nPara escolher a cidade escreva /city <nome da cidade>.")
+		if 'city' in user_info:
+			city = user_info['city']
+			await update.message.reply_text(f"A cidade escolhida para as notificações de tempo é {city}." \
+			"\nPara atualizar a cidade escreva /city <nome da cidade>.")
+		else:
+			await update.message.reply_text("Sem cidade determinada para as atualizações do tempo." \
+			"\nPara escolher a cidade escreva /city <nome da cidade>.")
 	else:
 		city = " ".join(context.args)
 		user_info = {'city': city}
