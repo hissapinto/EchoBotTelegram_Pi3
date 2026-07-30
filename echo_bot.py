@@ -7,9 +7,6 @@ import requests
 import random
 import datetime
 import json
-import openmeteo_requests
-import requests_cache
-from retry_requests import retry
 
 # Fetch Token via env
 load_dotenv()
@@ -171,32 +168,28 @@ async def forecast(update: Update, context):
 		lat = user_info['lat']
 		lon = user_info['lon']
 		tz = user_info['tz']
-
-		# Setup the Open-Meteo API client with cache and retry on error
-		cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
-		retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
-		openmeteo = openmeteo_requests.Client(session = retry_session)
-
-		url = "https://api.open-meteo.com/v1/forecast"
-		params = {
-			"latitude": lat,
-			"longitude": lon,
-			"daily": ["temperature_2m_max", "temperature_2m_min", "precipitation_probability_max"],
-			"timezone": tz,
-			"forecast_days": 1,
-		}
-
-		responses = openmeteo.weather_api(url, params = params)
-		resp = responses[0]
-		daily = resp.Daily()
-		temp_max = daily.Variables(0)
-		temp_min = daily.Variables(1)
-		precipitation_prob = daily.Variables(2)
-
-		await update.message.reply_text(f"Hoje {city} terá a máxima de {temp_max} e a mínima de {temp_min},\ncom chance máxima de precipitação de {precipitation_prob}.")
-		
 	except FileNotFoundError:
 		await update.message.reply_text("Utilize o comando /city para registrar a cidade que você deseja informações de clima.")
+		return
+
+	url = "https://api.open-meteo.com/v1/forecast"
+	params = {
+		"latitude": lat,
+		"longitude": lon,
+		"daily": ["temperature_2m_max", "temperature_2m_min", "precipitation_probability_max"],
+		"timezone": tz,
+		"forecast_days": 1,
+	}
+	responses = requests.get(url, params = params)
+	resp = responses.json()
+
+	temp_max = resp["daily"]["temperature_2m_max"][0]
+	temp_min = resp["daily"]["temperature_2m_min"][0]
+	rain = resp["daily"]["precipitation_probability_max"][0]
+
+	await update.message.reply_text(
+        f"Hoje {city} terá máxima de {temp_max}°C e mínima de {temp_min}°C,\n"
+        f"com chance máxima de chuva de {rain}%.")
 
 # add handlers
 def add_handlers(app):
