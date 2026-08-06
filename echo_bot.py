@@ -235,7 +235,7 @@ async def forecast(update: Update, context):
 			job.schedule_removal()
 
 		# especifica o horário
-		horario = datetime.time(hour=15, minute=17, tzinfo=ZoneInfo(user_info['tz']))
+		horario = datetime.time(hour=15, minute=23, tzinfo=ZoneInfo(user_info['tz']))
 
 		# agenda
 		context.job_queue.run_daily(
@@ -269,7 +269,7 @@ def _reschedule_forecast(app):
 	except FileNotFoundError:
 			return
 
-	if user_info.get('notify'): # retorna o valor ou null -> não quebra
+	if user_info.get('notify') and user_info.get('chat_id') and user_info.get('tz'): # .get retorna o valor ou null -> não quebra
 		chat_id = user_info['chat_id']
 		job_name = "forecast"
 		horario = datetime.time(hour=7, minute=0, tzinfo=ZoneInfo(user_info['tz']))
