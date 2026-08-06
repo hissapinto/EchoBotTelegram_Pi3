@@ -7,7 +7,7 @@ import requests
 import random
 import datetime
 import json
-import pytz
+from zoneinfo import ZoneInfo
 
 # Fetch Token via env
 load_dotenv()
@@ -222,7 +222,10 @@ async def forecast(update: Update, context):
 		await update.message.reply_text(text)
 
 	elif context.args[0].lower() == "yes":
+		chat_id = update.effective_chat.id
+
 		user_info['notify'] = True
+		user_info['chat_id'] = chat_id
 		with open('user_info.json', 'w') as file:
 			json.dump(user_info, file)
 
@@ -232,15 +235,13 @@ async def forecast(update: Update, context):
 			job.schedule_removal()
 
 		# especifica o horário
-		timezone_cidade = pytz.timezone(user_info.get('tz', 'America/Sao_Paulo'))
-		horario = datetime.time(hour=7, minute=0, tzinfo=timezone_cidade)
+		horario = datetime.time(hour=15, minute=17, tzinfo=ZoneInfo(user_info['tz']))
 
 		# agenda
-		chat_id = update.effective_chat.id
 		context.job_queue.run_daily(
             _forecast_callback,
             time=horario,
-            days=(0, 1, 2, 3, 4, 5, 6), # Todos os dias da semana
+            days=(0, 1, 2, 3, 4, 5, 6),
             name=job_name,
 			chat_id=chat_id,
             data=user_info # passa o dic como argumento
@@ -259,6 +260,29 @@ async def forecast(update: Update, context):
 			job.schedule_removal()
 
 		await update.message.reply_text("Atualizações diárias de clima desativadas.")
+
+# reschedule forecast
+def _reschedule_forecast(app):
+	try: 
+		with open('user_info.json') as file:
+			user_info = json.load(file)
+	except FileNotFoundError:
+			return
+
+	if user_info.get('notify'): # retorna o valor ou null -> não quebra
+		chat_id = user_info['chat_id']
+		job_name = "forecast"
+		horario = datetime.time(hour=7, minute=0, tzinfo=ZoneInfo(user_info['tz']))
+
+		# agenda
+		app.job_queue.run_daily(
+			_forecast_callback,
+			time=horario,
+			days=(0, 1, 2, 3, 4, 5, 6),
+			name=job_name,
+			chat_id=chat_id,
+			data=user_info
+		)
 
 
 # add handlers
@@ -286,6 +310,9 @@ def main() -> None:
 
 	# Register handlers
 	add_handlers(app)
+
+	# Reschedule forecast notifications
+	_reschedule_forecast(app)
 
 	# Run the bot until user presses Ctrl-C
 	app.run_polling(allowed_updates=Update.ALL_TYPES)
