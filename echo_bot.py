@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import logging
 import os
 
+# Importar os arquivo
 from alarms import alarm_min, alarm_days
 from forecast import forecast, reschedule_forecast, city
 from basic_commands import start, echo, roll, get_time, help, get_fact

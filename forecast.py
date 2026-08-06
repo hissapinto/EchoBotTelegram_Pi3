@@ -4,6 +4,8 @@ import datetime
 import json
 from zoneinfo import ZoneInfo
 
+from persistence import load_user_info, save_user_info
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -74,11 +76,8 @@ async def forecast(update: Update, context):
 	"""handle user info for forecast and updates notify"""
 	job_name = "forecast"
 
-	try: 
-		with open('user_info.json') as file:
-			user_info = json.load(file)
-
-	except FileNotFoundError:
+	user_info = load_user_info()
+	if not user_info.get('city'):
 		await update.message.reply_text("Utilize o comando /city para registrar a cidade que você deseja informações de clima.")
 		return
 
@@ -91,33 +90,15 @@ async def forecast(update: Update, context):
 
 		user_info['notify'] = True
 		user_info['chat_id'] = chat_id
-		with open('user_info.json', 'w') as file:
-			json.dump(user_info, file)
 
-		# remove agendamentos anteriores
-		current_jobs = context.job_queue.get_jobs_by_name(job_name)
-		for job in current_jobs:
-			job.schedule_removal()
-
-		# especifica o horário
-		horario = datetime.time(hour=7, minute=0, tzinfo=ZoneInfo(user_info['tz']))
-
-		# agenda
-		context.job_queue.run_daily(
-            _forecast_callback,
-            time=horario,
-            days=(0, 1, 2, 3, 4, 5, 6),
-            name=job_name,
-			chat_id=chat_id,
-            data=user_info # passa o dic como argumento
-        )
+		save_user_info(user_info)
+		schedule_forecast(context.job_queue, chat_id, user_info)
 
 		await update.message.reply_text(f"Atualizações diárias ativadas! Você receberá a previsão todos os dias às 07:00 (Horário de {user_info['tz']}).")
 
 	elif context.args[0].lower() == "no":
 		user_info['notify'] = False
-		with open('user_info.json', 'w') as file:
-			json.dump(user_info, file)
+		save_user_info(user_info)
 
 		# cancela o agendamento
 		current_jobs = context.job_queue.get_jobs_by_name(job_name)
@@ -128,36 +109,39 @@ async def forecast(update: Update, context):
 
 # reschedule forecast
 def reschedule_forecast(app):
-	try: 
-		with open('user_info.json') as file:
-			user_info = json.load(file)
-	except FileNotFoundError:
-			return
+
+	user_info = load_user_info()
+	if not user_info:
+		return
 
 	if user_info.get('notify') and user_info.get('chat_id') and user_info.get('tz'): # .get retorna o valor ou null -> não quebra
-		chat_id = user_info['chat_id']
-		job_name = "forecast"
-		horario = datetime.time(hour=7, minute=0, tzinfo=ZoneInfo(user_info['tz']))
+		schedule_forecast(app.job_queue, user_info['chat_id'], user_info)
 
-		# agenda
-		app.job_queue.run_daily(
-			_forecast_callback,
-			time=horario,
-			days=(0, 1, 2, 3, 4, 5, 6),
-			name=job_name,
-			chat_id=chat_id,
-			data=user_info
-		)
+# schedule on job queue
+def schedule_forecast(job_queue, job_name, chat_id, user_info):
+	# remove agendamentos anteriores
+	current_jobs = job_queue.get_jobs_by_name(job_name)
+	for job in current_jobs:
+		job.schedule_removal()
+	
+	# especifica o horário
+	horario = datetime.time(hour=7, minute=0, tzinfo=ZoneInfo(user_info['tz']))
+	
+	# agenda
+	job_queue.run_daily(
+		_forecast_callback,
+		time=horario,
+		days=(0, 1, 2, 3, 4, 5, 6),
+		name=job_name,
+		chat_id=chat_id,
+		data=user_info # passa o dic como argumento
+	)
 
 # city persistence
 async def city(update: Update, context):
 	"""Saves or print the city name"""
 	if len(context.args) < 1:
-		try: 
-			with open('user_info.json') as file: # 'with' closes the file without the need of file.close() command
-				user_info = json.load(file)
-		except FileNotFoundError:
-			user_info = {} # creates missing dic
+		user_info = load_user_info()
 
 		if 'city' in user_info:
 			city = user_info['city']
@@ -182,10 +166,17 @@ async def city(update: Update, context):
 			lat = resp_data['results'][0]["latitude"]
 			lon = resp_data['results'][0]["longitude"]
 			tz = resp_data['results'][0]["timezone"]
-			user_info = {'city' : city, 'lat' : lat, 'lon' : lon, 'tz': tz}
 
-			with open('user_info.json', 'w') as file:
-				json.dump(user_info, file)
+			user_info = load_user_info()
+			user_info['city'] = city
+			user_info['lon'] = lon
+			user_info['tz'] = tz
+			save_user_info(user_info)
+
+			# atualiza as notificações
+			if user_info.get('notify') and user_info.get('chat_id'):
+				schedule_forecast(context.job_queue, "forecast", user_info['chat_id'], user_info)
+	
 			await update.message.reply_text(f"Cidade atualizada para {city}.\nLatitude = {lat}\nlongitude = {lon}")
 		except requests.exceptions.RequestException as e:
 				logger.error(f"Erro ao buscar latitude e longitude: {e}")
