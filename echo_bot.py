@@ -7,6 +7,7 @@ import requests
 import random
 import datetime
 import json
+import pytz
 
 # Fetch Token via env
 load_dotenv()
@@ -151,6 +152,11 @@ async def city(update: Update, context):
 			resp.raise_for_status()
 			resp_data = resp.json()
 
+			# Se não achou a cidade
+			if 'results' not in resp_data:
+				await update.message.reply_text("Desculpe, não consegui encontrar essa cidade.")
+				return
+
 			lat = resp_data['results'][0]["latitude"]
 			lon = resp_data['results'][0]["longitude"]
 			tz = resp_data['results'][0]["timezone"]
@@ -163,51 +169,96 @@ async def city(update: Update, context):
 				logger.error(f"Erro ao buscar latitude e longitude: {e}")
 				await update.message.reply_text("Desculpe, não consegui atualizar sua cidade agora. Tente novamente mais tarde.")
 
-# city forecast
-async def forecast(update: Update, context):
+# forecast callback
+async def _forecast_callback(context):
+	"""Callback function to send the forecast message."""
+	job = context.job
+	user_info = job.data
+
+	message = await _forecast_message(user_info)
+	await context.bot.send_message(job.chat_id, text=f"🌤️ Bom dia! Aqui está a previsão de hoje:\n\n{message}")
+
+# fetch forecast info
+async def _forecast_message(user_info):
 	"""Fetch city forecast information via open meteo API"""
+	city = user_info['city']
+	lat = user_info['lat']
+	lon = user_info['lon']
+	timezone = user_info['tz']
+	
+	url = "https://api.open-meteo.com/v1/forecast"
+	params = {
+			"latitude": lat,
+			"longitude": lon,
+			"daily": ["temperature_2m_max", "temperature_2m_min", "precipitation_probability_max"],
+			"timezone": timezone,
+			"forecast_days": 1,
+	}
+	responses = requests.get(url, params = params)
+	resp = responses.json()
+	
+	temp_max = resp["daily"]["temperature_2m_max"][0]
+	temp_min = resp["daily"]["temperature_2m_min"][0]
+	rain = resp["daily"]["precipitation_probability_max"][0]
+	
+	return(f"Hoje {city} terá máxima de {temp_max}°C e mínima de {temp_min}°C,"
+	f"com chance máxima de chuva de {rain}%.")
+
+# forecast updates
+async def forecast(update: Update, context):
+	"""handle user info for forecast and updates notify"""
+	job_name = "forecast"
+
 	try: 
 		with open('user_info.json') as file:
 			user_info = json.load(file)
-		
-			city = user_info['city']
-			lat = user_info['lat']
-			lon = user_info['lon']
-			timezone = user_info['tz']
 
 	except FileNotFoundError:
 		await update.message.reply_text("Utilize o comando /city para registrar a cidade que você deseja informações de clima.")
 		return
 
 	if len(context.args) < 1:
-		url = "https://api.open-meteo.com/v1/forecast"
-		params = {
-			"latitude": lat,
-			"longitude": lon,
-			"daily": ["temperature_2m_max", "temperature_2m_min", "precipitation_probability_max"],
-			"timezone": timezone,
-			"forecast_days": 1,
-		}
-		responses = requests.get(url, params = params)
-		resp = responses.json()
-
-		temp_max = resp["daily"]["temperature_2m_max"][0]
-		temp_min = resp["daily"]["temperature_2m_min"][0]
-		rain = resp["daily"]["precipitation_probability_max"][0]
-
-		await update.message.reply_text(
-        f"Hoje {city} terá máxima de {temp_max}°C e mínima de {temp_min}°C,"
-        f"com chance máxima de chuva de {rain}%.")
+		text = await _forecast_message(user_info)
+		await update.message.reply_text(text)
 
 	elif context.args[0].lower() == "yes":
 		user_info['notify'] = True
 		with open('user_info.json', 'w') as file:
 			json.dump(user_info, file)
 
+		# remove agendamentos anteriores
+		current_jobs = context.job_queue.get_jobs_by_name(job_name)
+		for job in current_jobs:
+			job.schedule_removal()
+
+		# especifica o horário
+		timezone_cidade = pytz.timezone(user_info.get('tz', 'America/Sao_Paulo'))
+		horario = datetime.time(hour=7, minute=0, tzinfo=timezone_cidade)
+
+		# agenda
+		chat_id = update.effective_chat.id
+		context.job_queue.run_daily(
+            _forecast_callback,
+            time=horario,
+            days=(0, 1, 2, 3, 4, 5, 6), # Todos os dias da semana
+            name=job_name,
+			chat_id=chat_id,
+            data=user_info # passa o dic como argumento
+        )
+
+		await update.message.reply_text(f"Atualizações diárias ativadas! Você receberá a previsão todos os dias às 07:00 (Horário de {user_info['tz']}).")
+
 	elif context.args[0].lower() == "no":
 		user_info['notify'] = False
 		with open('user_info.json', 'w') as file:
 			json.dump(user_info, file)
+
+		# cancela o agendamento
+		current_jobs = context.job_queue.get_jobs_by_name(job_name)
+		for job in current_jobs:
+			job.schedule_removal()
+
+		await update.message.reply_text("Atualizações diárias de clima desativadas.")
 
 
 # add handlers
