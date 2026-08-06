@@ -201,7 +201,7 @@ async def _forecast_message(user_info):
 	temp_min = resp["daily"]["temperature_2m_min"][0]
 	rain = resp["daily"]["precipitation_probability_max"][0]
 	
-	return(f"Hoje {city} terá máxima de {temp_max}°C e mínima de {temp_min}°C,"
+	return(f"Hoje {city} terá máxima de {temp_max}°C e mínima de {temp_min}°C, "
 	f"com chance máxima de chuva de {rain}%.")
 
 # forecast updates
@@ -235,7 +235,7 @@ async def forecast(update: Update, context):
 			job.schedule_removal()
 
 		# especifica o horário
-		horario = datetime.time(hour=15, minute=23, tzinfo=ZoneInfo(user_info['tz']))
+		horario = datetime.time(hour=7, minute=0, tzinfo=ZoneInfo(user_info['tz']))
 
 		# agenda
 		context.job_queue.run_daily(
