@@ -176,7 +176,7 @@ async def _forecast_callback(context):
 	user_info = job.data
 
 	message = await _forecast_message(user_info)
-	await context.bot.send_message(job.chat_id, text=f"🌤️ Bom dia! Aqui está a previsão de hoje:\n\n{message}")
+	await context.bot.send_message(job.chat_id, text=f"🌞 Bom dia! Aqui está a previsão de hoje:\n\n{message}")
 
 # fetch forecast info
 async def _forecast_message(user_info):
@@ -208,7 +208,7 @@ async def _forecast_message(user_info):
 	if rain >= 30:
 		rain_message = f"\nChances de chuva de {rain}%."
 	else:
-		rain_message = f"\nChances baixas de chuva, {rain}%."
+		rain_message = f"\nChances baixas de chuva: {rain}%."
 
 	# weather code message
 	match code:
@@ -219,9 +219,9 @@ async def _forecast_message(user_info):
 		case 45 | 48:
 			code_message = "🌬️ Dia enevoado "
 		case 51 | 53 | 55:
-			code_message = "🌦️ Dia de garoa leve "
+			code_message = "☁️ Dia nublado "
 		case 56 | 57:
-			code_message = "🌧️ Dia de garoa gelada "
+			code_message = "🌧️ Dia de garoa "
 		case 61 | 63 | 65 | 80 | 81:
 			code_message = "🌧️ Dia de chuva "
 		case 66 | 67 | 82:
@@ -299,7 +299,7 @@ def _reschedule_forecast(app):
 	if user_info.get('notify') and user_info.get('chat_id') and user_info.get('tz'): # .get retorna o valor ou null -> não quebra
 		chat_id = user_info['chat_id']
 		job_name = "forecast"
-		horario = datetime.time(hour=16, minute=6, tzinfo=ZoneInfo(user_info['tz']))
+		horario = datetime.time(hour=7, minute=0, tzinfo=ZoneInfo(user_info['tz']))
 
 		# agenda
 		app.job_queue.run_daily(
