@@ -190,7 +190,7 @@ async def _forecast_message(user_info):
 	params = {
 			"latitude": lat,
 			"longitude": lon,
-			"daily": ["temperature_2m_max", "temperature_2m_min", "precipitation_probability_max"],
+			"daily": ["weather_code","temperature_2m_max", "temperature_2m_min", "precipitation_probability_max"],
 			"timezone": timezone,
 			"forecast_days": 1,
 	}
@@ -200,9 +200,36 @@ async def _forecast_message(user_info):
 	temp_max = resp["daily"]["temperature_2m_max"][0]
 	temp_min = resp["daily"]["temperature_2m_min"][0]
 	rain = resp["daily"]["precipitation_probability_max"][0]
+	code = resp["daily"]["weather_code"][0]
+
+	# rain message
+	if rain >= 60:
+		rain_message = f"\nChances de chuva de {rain}%! Não esqueça do guarda chuva."
+	if rain >= 30:
+		rain_message = f"\nChances de chuva de {rain}%."
+	else:
+		rain_message = f"\nChances baixas de chuva, {rain}%."
+
+	# weather code message
+	match code:
+		case 0:
+			code_message = "☀️ Dia ensolarado "
+		case 1 | 2 | 3:
+			code_message = "🌤️ Dia parcialmente nublado "
+		case 45 | 48:
+			code_message = "🌬️ Dia enevoado "
+		case 51 | 53 | 55:
+			code_message = "🌦️ Dia de garoa leve "
+		case 56 | 57:
+			code_message = "🌧️ Dia de garoa gelada "
+		case 61 | 63 | 65 | 80 | 81:
+			code_message = "🌧️ Dia de chuva "
+		case 66 | 67 | 82:
+			code_message = "⛈️ Dia de chuva intensa "
+		case 71 | 73 | 75 | 77 | 85 | 86:
+			code_message = "❄️ Dia de neve (👀 oxe???) "
 	
-	return(f"Hoje {city} terá máxima de {temp_max}°C e mínima de {temp_min}°C, "
-	f"com chance máxima de chuva de {rain}%.")
+	return(code_message + f"hoje em {city}.\nMáxima de {temp_max}°C e mínima de {temp_min}°C." + rain_message)
 
 # forecast updates
 async def forecast(update: Update, context):
@@ -272,7 +299,7 @@ def _reschedule_forecast(app):
 	if user_info.get('notify') and user_info.get('chat_id') and user_info.get('tz'): # .get retorna o valor ou null -> não quebra
 		chat_id = user_info['chat_id']
 		job_name = "forecast"
-		horario = datetime.time(hour=7, minute=0, tzinfo=ZoneInfo(user_info['tz']))
+		horario = datetime.time(hour=16, minute=6, tzinfo=ZoneInfo(user_info['tz']))
 
 		# agenda
 		app.job_queue.run_daily(
