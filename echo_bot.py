@@ -110,7 +110,7 @@ async def help(update: Update, context):
 	"/alarm_min - Definir um lembrete que dispara em minutos (ex: /alarm_min 10 Ligue para sua mãe)\n"
 	"/alarm_days - Definir um lembrete que dispara em dias (ex: /alarm_days 2 12:00 Compre leite)\n"
 	"/city - Definir que cidade você se encontra\n"
-	"/forecast - Trás informações diárias do clima\n"
+	"/forecast - Trás informações diárias do clima\n, acrescente 'yes'para receber atualizações todos os dias automaticamente e 'no' para cancelar"
 	# "/facts - Obter um fato interessante em inglês\n"
 	# "/dice - Sortear um número entre 1 e 6\n/time - Ver a hora atual\n"
 	)
