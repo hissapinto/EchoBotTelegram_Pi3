@@ -110,8 +110,8 @@ async def help(update: Update, context):
 	"/alarm_days - Definir um lembrete que dispara em dias (ex: /alarm_days 2 12:00 Compre leite)\n"
 	"/city - Definir que cidade você se encontra\n"
 	"/forecast - Trás informações diárias do clima\n"
-	"/facts - Obter um fato interessante em inglês\n"
-	"/dice - Sortear um número entre 1 e 6\n/time - Ver a hora atual\n"
+	# "/facts - Obter um fato interessante em inglês\n"
+	# "/dice - Sortear um número entre 1 e 6\n/time - Ver a hora atual\n"
 	)
 
 # facts
@@ -170,32 +170,45 @@ async def forecast(update: Update, context):
 		with open('user_info.json') as file:
 			user_info = json.load(file)
 		
-		city = user_info['city']
-		lat = user_info['lat']
-		lon = user_info['lon']
-		tz = user_info['tz']
+			city = user_info['city']
+			lat = user_info['lat']
+			lon = user_info['lon']
+			timezone = user_info['tz']
+
 	except FileNotFoundError:
 		await update.message.reply_text("Utilize o comando /city para registrar a cidade que você deseja informações de clima.")
 		return
 
-	url = "https://api.open-meteo.com/v1/forecast"
-	params = {
-		"latitude": lat,
-		"longitude": lon,
-		"daily": ["temperature_2m_max", "temperature_2m_min", "precipitation_probability_max"],
-		"timezone": tz,
-		"forecast_days": 1,
-	}
-	responses = requests.get(url, params = params)
-	resp = responses.json()
+	if len(context.args) < 1:
+		url = "https://api.open-meteo.com/v1/forecast"
+		params = {
+			"latitude": lat,
+			"longitude": lon,
+			"daily": ["temperature_2m_max", "temperature_2m_min", "precipitation_probability_max"],
+			"timezone": timezone,
+			"forecast_days": 1,
+		}
+		responses = requests.get(url, params = params)
+		resp = responses.json()
 
-	temp_max = resp["daily"]["temperature_2m_max"][0]
-	temp_min = resp["daily"]["temperature_2m_min"][0]
-	rain = resp["daily"]["precipitation_probability_max"][0]
+		temp_max = resp["daily"]["temperature_2m_max"][0]
+		temp_min = resp["daily"]["temperature_2m_min"][0]
+		rain = resp["daily"]["precipitation_probability_max"][0]
 
-	await update.message.reply_text(
+		await update.message.reply_text(
         f"Hoje {city} terá máxima de {temp_max}°C e mínima de {temp_min}°C,"
         f"com chance máxima de chuva de {rain}%.")
+
+	elif context.args[0].lower() == "yes":
+		user_info['notify'] = True
+		with open('user_info.json', 'w') as file:
+			json.dump(user_info, file)
+
+	elif context.args[0].lower() == "no":
+		user_info['notify'] = False
+		with open('user_info.json', 'w') as file:
+			json.dump(user_info, file)
+
 
 # add handlers
 def add_handlers(app):
