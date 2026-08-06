@@ -205,7 +205,7 @@ async def _forecast_message(user_info):
 	# rain message
 	if rain >= 60:
 		rain_message = f"\nChances de chuva de {rain}%! Não esqueça do guarda chuva."
-	if rain >= 30:
+	elif rain >= 30:
 		rain_message = f"\nChances de chuva de {rain}%."
 	else:
 		rain_message = f"\nChances baixas de chuva: {rain}%."
