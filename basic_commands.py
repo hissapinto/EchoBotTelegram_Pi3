@@ -3,6 +3,8 @@ import random
 import datetime
 import requests
 
+from slm_model import model_response
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -17,7 +19,8 @@ async def start(update: Update, context):
 # echo
 async def echo(update: Update, context):
 	"""Echoes the user message."""
-	await update.message.reply_text(update.message.text)
+	text = model_response(context)
+	await update.message.reply_text(text)
 
 # roll
 async def roll(update: Update, context):
