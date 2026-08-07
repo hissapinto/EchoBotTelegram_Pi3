@@ -115,7 +115,7 @@ def reschedule_forecast(app):
 		return
 
 	if user_info.get('notify') and user_info.get('chat_id') and user_info.get('tz'): # .get retorna o valor ou null -> não quebra
-		schedule_forecast(app.job_queue, user_info['chat_id'], user_info)
+		schedule_forecast(app.job_queue, "forecast", user_info['chat_id'], user_info)
 
 # schedule on job queue
 def schedule_forecast(job_queue, job_name, chat_id, user_info):
