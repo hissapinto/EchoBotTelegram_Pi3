@@ -92,7 +92,7 @@ async def forecast(update: Update, context):
 		user_info['chat_id'] = chat_id
 
 		save_user_info(user_info)
-		schedule_forecast(context.job_queue, chat_id, user_info)
+		schedule_forecast(context.job_queue, "forecast", chat_id, user_info)
 
 		await update.message.reply_text(f"Atualizações diárias ativadas! Você receberá a previsão todos os dias às 07:00 (Horário de {user_info['tz']}).")
 
