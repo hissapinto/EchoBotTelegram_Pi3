@@ -1,4 +1,5 @@
 from telegram import Update
+from telegram.constants import ChatAction
 import random
 import datetime
 import requests
@@ -20,8 +21,7 @@ async def start(update: Update, context):
 # echo
 async def echo(update: Update, context):
 	"""Echoes the user message."""
-	# Envia o status de "digitando..." para o usuário ver que o Pi 3 está processando
-	await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+	await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
 
 	input_user = update.message.text
 	ia_context = "Você é um assistente útil e conciso. Responda em Português"

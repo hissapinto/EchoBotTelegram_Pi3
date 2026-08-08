@@ -43,7 +43,15 @@ def main() -> None:
 		raise ValueError("TELEGRAM_BOT_TOKEN environment variable not set.")
 
 	# Create the application and pass it back to your bot's token.
-	app = Application.builder().token(TOKEN).build()
+	app = (
+    Application.builder()
+    .token(TOKEN)
+    .read_timeout(60)
+    .write_timeout(60)
+    .connect_timeout(60)
+    .pool_timeout(60)
+    .build()
+	)
 
 	# Register handlers
 	add_handlers(app)
