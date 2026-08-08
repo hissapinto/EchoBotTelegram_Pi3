@@ -24,7 +24,7 @@ async def alarm_min(update: Update, context):
 		await update.message.reply_text(f"Lembrete: {label}.\nDefinido para {int(total_seconds/60)} minutos.")
 
 	except (IndexError, ValueError):
-		await update.message.reply_text("Uso: /alarm_min <minutos> <o que você quer lembrar> (ex: /alarm 10 Saia de casa)")
+		await update.message.reply_text("Uso: /alarm_min <minutos> <o que você quer lembrar> (ex: /alarm_min 10 Saia de casa)")
 
 # alarm days
 async def alarm_days(update: Update, context):

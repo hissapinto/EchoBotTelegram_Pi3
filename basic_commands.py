@@ -15,7 +15,7 @@ async def start(update: Update, context):
 	"""Sends a welcomer message when the command /start is issued."""
 	user = update.effective_user
 	await update.message.reply_html(
-		f"Olá, {user.mention_html()}! Eu sou um bot de eco, mas também posso lhe ajudar com algumas outras coisas.\n\nDigite /help para saber mais."
+		f"🖖 Olá, {user.mention_html()}! Sou um bot de IA (Gemma3) rodando localmente em um Raspberry Pi 3.\nPosso tirar dúvida, agendar lembretes e trazer informações de clima.\n\nDigite /help para saber mais."
 	)
 
 # anwser
@@ -48,7 +48,7 @@ async def get_time(update: Update, context):
 # help
 async def help(update: Update, context):
 	"""Send a help message."""
-	await update.message.reply_text("Me mande uma mensagem e eu lhe retorno a mesma mensagem.\n\n"
+	await update.message.reply_text("Me mande uma pergunta e eu lhe respondo!\n\n"
 	"Você também pode usar os seguintes comandos:\n"
 	"/start - Iniciar o bot\n"
 	"/help - Exibir esta mensagem de ajuda\n"
