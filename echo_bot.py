@@ -7,7 +7,7 @@ import os
 # Importar os arquivo
 from alarms import alarm_min, alarm_days
 from forecast import forecast, reschedule_forecast, city
-from basic_commands import start, echo, roll, get_time, help, get_fact
+from basic_commands import start, reponse, roll, get_time, help, get_fact
 
 # Fetch Token via env
 load_dotenv()
@@ -33,7 +33,7 @@ def add_handlers(app):
 	app.add_handler(CommandHandler("alarm_days", alarm_days))
 	app.add_handler(CommandHandler("city", city))
 	app.add_handler(CommandHandler("forecast", forecast))
-	app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+	app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, reponse))
 
 # main
 def main() -> None:

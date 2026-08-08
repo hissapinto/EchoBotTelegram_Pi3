@@ -18,10 +18,13 @@ async def start(update: Update, context):
 		f"Olá, {user.mention_html()}! Eu sou um bot de eco, mas também posso lhe ajudar com algumas outras coisas.\n\nDigite /help para saber mais."
 	)
 
-# echo
-async def echo(update: Update, context):
-	"""Echoes the user message."""
+# anwser
+async def reponse(update: Update, context):
+	"""Anwser user using Gemma3."""
 	await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
+
+	waiting_message = await update.message.reply_text("⏳ *Pensando...*\n", parse_mode="Markdown")
+	await update.message.reply_text(waiting_message)
 
 	input_user = update.message.text
 	ia_context = "Você é um assistente útil e conciso. Responda em Português"
@@ -32,7 +35,7 @@ async def echo(update: Update, context):
         cabecalho=ia_context
     )
 
-	await update.message.reply_text(output_gemma)
+	await waiting_message.edit_text(output_gemma) # adiciona a mensagem em vez de mandar outra
 
 # roll
 async def roll(update: Update, context):
