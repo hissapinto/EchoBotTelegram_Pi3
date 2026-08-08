@@ -28,7 +28,7 @@ async def echo(update: Update, context):
 
 	output_gemma = await asyncio.to_thread(
         model_response, 
-        input_text=input_user, 
+        input=input_user, 
         cabecalho=ia_context
     )
 
