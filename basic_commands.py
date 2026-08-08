@@ -23,7 +23,7 @@ async def reponse(update: Update, context):
 	"""Anwser user using Gemma3."""
 	await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
 
-	waiting_message = await update.message.reply_text("⏳ *Pensando...*\n", parse_mode="Markdown")
+	waiting_message = await update.message.reply_text("⏳ *Pensando...*", parse_mode="Markdown")
 	await update.message.reply_text(waiting_message)
 
 	input_user = update.message.text
@@ -35,7 +35,7 @@ async def reponse(update: Update, context):
         cabecalho=ia_context
     )
 
-	await waiting_message.edit_text(output_gemma) # adiciona a mensagem em vez de mandar outra
+	await update.message.reply_text(output_gemma)
 
 # roll
 async def roll(update: Update, context):
