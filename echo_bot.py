@@ -8,6 +8,7 @@ import os
 from alarms import alarm_min, alarm_days
 from forecast import forecast, reschedule_forecast, city
 from basic_commands import start, echo, roll, get_time, help, get_fact
+from slm_model import start_ollama
 
 # Fetch Token via env
 load_dotenv()
@@ -21,6 +22,9 @@ logging.basicConfig(
 # set higher logging level for httpx to avoid all GET and POST requests being logged
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
+
+# start Gemma
+start_ollama()
 
 # add handlers
 def add_handlers(app):

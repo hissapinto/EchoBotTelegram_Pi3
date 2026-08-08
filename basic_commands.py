@@ -2,6 +2,7 @@ from telegram import Update
 import random
 import datetime
 import requests
+import asyncio
 
 from slm_model import model_response
 
@@ -19,8 +20,19 @@ async def start(update: Update, context):
 # echo
 async def echo(update: Update, context):
 	"""Echoes the user message."""
-	text = model_response(context)
-	await update.message.reply_text(text)
+	# Envia o status de "digitando..." para o usuário ver que o Pi 3 está processando
+	await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
+
+	input_user = update.message.text
+	ia_context = "Você é um assistente útil e conciso. Responda em Português"
+
+	output_gemma = await asyncio.to_thread(
+        model_response, 
+        input_text=input_user, 
+        cabecalho=ia_context
+    )
+
+	await update.message.reply_text(output_gemma)
 
 # roll
 async def roll(update: Update, context):
