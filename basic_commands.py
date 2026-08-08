@@ -23,8 +23,8 @@ async def reponse(update: Update, context):
 	"""Anwser user using Gemma3."""
 	await context.bot.send_chat_action(chat_id=update.effective_chat.id, action=ChatAction.TYPING)
 
-	waiting_message = await update.message.reply_text("⏳ *Pensando...*", parse_mode="Markdown")
-	await update.message.reply_text(waiting_message)
+	# waiting_message = await update.message.reply_text("⏳ *Pensando...*", parse_mode="Markdown")
+	# await update.message.reply_text(waiting_message)
 
 	input_user = update.message.text
 	ia_context = "Você é um assistente útil e conciso. Responda em Português"
