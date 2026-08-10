@@ -1,7 +1,7 @@
 # Antigo
 """
 async def status(update: Update, context):
-    """Envia a temperatura e o espaço em disco do Raspberry Pi."""
+    Envia a temperatura e o espaço em disco do Raspberry Pi.
 
     # Temperatura do Pi:
     # subprocess.check_output roda um comando do terminal pelo Python e captura a saída.
@@ -26,7 +26,6 @@ async def status(update: Update, context):
     message = temp_message + "\n\n" + disk
     await update.message.reply_text(message)
     """
-
 
 import psutil
 import subprocess
@@ -54,7 +53,7 @@ async def status(update: Update, context):
 
     # RAM
     # virtual_memory() devolve em struct/class?
-    # dividir por 1024**2 pra ser em MG (vem em bytes)
+    # dividir por 1024**2 pra ser em MB (vem em bytes)
     mem = psutil.virtual_memory()
     mem_usada = mem.used / (1024**2)
     mem_total = mem.total / (1024**2)
