@@ -25,7 +25,7 @@ async def status(update: Update, context):
     temp_message = "Temperatura do Raspberry PI3: " + str(temp) + "°C"
     message = temp_message + "\n\n" + disk
     await update.message.reply_text(message)
-    """"
+    """
 
 
 import psutil
