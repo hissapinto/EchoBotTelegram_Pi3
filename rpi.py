@@ -80,7 +80,8 @@ async def status(update: Update, context):
 
     # mensagem
     message = (
-        f"Informações do {modelo}:\n\n"
+        f"Informações do hardware:\n\n"
+        f"Modelo: {modelo}"
         f"Temperatura: {temp}°C\n"
         f"CPU: {cpu}%\n"
         f"RAM: {mem_usada:.0f} / {mem_total:.0f} MB ({mem.percent}%)\n"
