@@ -48,7 +48,7 @@ async def get_time(update: Update, context):
 # help
 async def help(update: Update, context):
 	"""Send a help message."""
-	await update.message.reply_text("Me mande uma pergunta e eu lhe respondo!\n\n"
+	await update.message.reply_text("Sou um bot de IA (Gemma3) rodando localmente em um Raspberry Pi 3.\nMe mande uma pergunta e eu lhe respondo!\n\n"
 	"Você também pode usar os seguintes comandos:\n"
 	"/start - Iniciar o bot\n"
 	"/help - Exibir esta mensagem de ajuda\n"

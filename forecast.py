@@ -15,8 +15,10 @@ async def _forecast_callback(context):
 	job = context.job
 	user_info = job.data
 
+	await context.bot.send_message(job.chat_id, text="🌞 Bom dia! Aqui está a previsão de hoje:")
+	
 	message = await _forecast_message(user_info)
-	await context.bot.send_message(job.chat_id, text=f"🌞 Bom dia! Aqui está a previsão de hoje:\n\n{message}")
+	await context.bot.send_message(job.chat_id, text=message)
 
 # fetch forecast info
 async def _forecast_message(user_info):
